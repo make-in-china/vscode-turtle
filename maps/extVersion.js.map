@@ -1,0 +1,1 @@
+{"version":3,"sources":["extVersion.ts"],"names":[],"mappings":";AAAA;kBAAe,OAAO,CAAC","file":"extVersion.js","sourcesContent":["export default '1.0.0';\r\n"],"sourceRoot":"/source/"}
