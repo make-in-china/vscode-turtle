@@ -305,13 +305,15 @@ vsturtle = {
         }catch(e){
             console.log(e);
         }
-        paths=this.setting.scriptPaths;
-        if(paths){
-            for(var i=0;i<paths.length;i++){
-                try{
-                    require(paths[i]).turtleActivate();
-                }catch(e){
-                    console.log(e);
+        if(this.setting){
+            paths=this.setting.scriptPaths;
+            if(paths){
+                for(var i=0;i<paths.length;i++){
+                    try{
+                        require(paths[i]).turtleActivate();
+                    }catch(e){
+                        console.log(e);
+                    }
                 }
             }
         }
@@ -498,14 +500,14 @@ vsturtle = {
                     var tableActions=composite.getTableActions();
                     _this.tableBar.clearChildren();
                     tableActions.forEach(function(element){
-                        _this.tableBarBox.div({class:'action-icon-item',role:"presentation"},function(div){
+                        _this.tableBarBox.div({class:'action-icon-item'},function(div){
                             if(element.enabled){
                                 div.on('click', function(event){
                                     dom.EventHelper.stop(event, true);
                                     element.run(event);
                                 });
                             }else{
-                                div.style('border-bottom-style','solid');
+                                div.addClass('active');
                             }
                             div.a({
                                 class:'action-icon-label icon '+element.class,
@@ -569,13 +571,13 @@ $1`);
         eventEmitter.emit('endUninstall');
     }
     function restoredAction(isRestored:number, willReinstall:boolean) {
-        // if (isRestored === 2) {
+        if (isRestored === 2) {
             if (willReinstall) {
                 emitEndUninstall();
             } else {
                 disabledRestart();
             }
-        // }
+        }
     }
 
     function restoreBak(willReinstall:boolean):void {
