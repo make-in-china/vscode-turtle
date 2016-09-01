@@ -1,0 +1,78 @@
+
+.monaco-action-bar .action-icon-item {
+	cursor: pointer;
+	padding-bottom: 0.325em;
+	padding-top: 0.325em;
+	margin-right:1em;
+	display: inline-block;
+	border-bottom: 2px #ccc;
+	-ms-transition: -ms-transform 100ms ease;
+	-webkit-transition: -webkit-transform 100ms ease;
+	-moz-transition: -moz-transform 100ms ease;
+	-o-transition: -o-transform 100ms ease;
+	transition: transform 100ms ease;
+	position: relative;  /* DO NOT REMOVE - this is the key to preventing the ghosting icon bug in Chrome 42 */
+}
+.monaco-action-bar .action-icon-label {
+	font-size: 12px;
+	margin-right: 0.3em;
+}
+.monaco-action-bar .action-icon-label {
+	padding-left: 1.6em;
+	background-position-x: left !important;
+}
+
+.monaco-action-bar .action-icon-label.octicon {
+	font-size: 15px;
+	line-height: 35px;
+	text-align: right;
+}
+
+.monaco-action-bar .action-item.disabled .action-icon-label,
+.monaco-action-bar .action-item.disabled .action-icon-label:hover {
+	opacity: 0.4;
+}
+/*
+.monaco-action-bar.vertical .action-icon-label.separator {
+	display: block;
+	border-bottom: 1px solid #bbb;
+	padding-top: 1px;
+	margin-left: .8em;
+	margin-right: .8em;
+}*/
+
+.secondary-actions .monaco-action-bar .action-icon-label {
+	margin-left: 6px;
+	margin-right: 2em;
+}
+
+.monaco-action-bar .action-icon-label {
+    padding-left: 2em;
+    background-position-x: left !important;
+    background-repeat: no-repeat;
+}
+
+.switchOutput{
+	background-image:url('output.svg');
+}
+.switchDebug{
+	background-image:url('debug.svg');
+}
+.switchProbrems{
+	background-image:url('progrem.svg');
+}
+.switchIntegratedTerminal{
+	background-image:url('terminal.svg');
+}
+/*.switchOutput.active{
+	background-image:url('output-light.svg');
+}
+.switchDebug.active{
+	background-image:url('debug-light.svg');
+}
+.SwitchProbrems.active{
+	background-image:url('progrem-light.svg');
+}
+.switchIntegratedTerminal.active{
+	background-image:url('terminal-light.svg');
+}*/
