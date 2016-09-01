@@ -85,12 +85,12 @@ export function activate(context:ExtensionContext):void{
         });
     }
     function addResource() {
-        let zipUrl ='';// 'https://github.com/robertohuertasm/vscode-icons/blob/master/icons.zip?raw=true';
+        let zipUrl ='https://github.com/make-in-china/vscode-turtle/blob/master/resource.zip?raw=true';
         let config:any = workspace.getConfiguration('vsicons');
         let resourcePath = vars.base + (vars.isWin ? '\\resource.zip' : '/resource.zip');
         let rx = /^http.+/i;
         let r = null;
-
+        debugger;
         if (config && config.icons) {
             zipUrl = config.icons;
         }
@@ -646,7 +646,6 @@ $1`);
     installTurtle = commands.registerCommand('extension.installTurtle', fInstall);
     uninstallTurtle = commands.registerCommand('extension.uninstallTurtle', fUninstall);
     reinstallTurtle = commands.registerCommand('extension.reinstallTurtle', fReinstall);
-    updateTurtleResource = commands.registerCommand('extension.updateTurtleResource', addResource);
 
     context.subscriptions.push(installTurtle);
     context.subscriptions.push(uninstallTurtle);
