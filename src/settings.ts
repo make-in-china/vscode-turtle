@@ -18,6 +18,7 @@ interface ISetting{
     isInsiders: boolean
     extensionFolder: string
     settingsPath: string
+    logPath:string
     pluginPath:string
     jsfile: string
     jsfilebak: string
@@ -45,6 +46,7 @@ export function getSettings():ISetting {
         isInsiders: isInsiders,
         extensionFolder: extensionFolder,
         settingsPath: path.join(appPath, codePath, 'User', 'vsturtle.settings.json'),
+        logPath:path.join(appPath,codePath,'user','vsturtle.log'),
         pluginPath: path.join(appPath, codePath, 'User', 'turtle.plugin'),
         jsfile: jsfile,
         jsfilebak: jsfilebak,

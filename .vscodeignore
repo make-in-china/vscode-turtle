@@ -1,4 +1,10 @@
-maps/
+maps/*
 resource.zip
-src/
+src/*
 images/logo.psd
+CHANGELOG.md
+GulpFile.js
+typings/*
+.vscode/*
+LICENSE
+.gitignore/*

@@ -8,9 +8,14 @@ let replace = require('replace-in-file');
 import * as events from 'events';
 import msg from './messages';
 import * as settings from './settings';
-export function deactivate(){
-    console.log('vscode-turtle is deactivate!');
-}
+let moment=require('moment');
+let log=(()=>{
+    let path=settings.getSettings().logPath;
+    return (info:string)=>{
+        fs.appendFileSync(path,moment().format("HH:mm:ss")+'\r\n'+info+'\r\n');
+    }
+})();
+export function deactivate(){}
 export function activate(context:ExtensionContext):void{
     let eventEmitter = new events.EventEmitter();
     let vars = settings.getSettings();
@@ -85,15 +90,16 @@ export function activate(context:ExtensionContext):void{
     }
     function addResource() {
         let zipUrl ='https://github.com/make-in-china/vscode-turtle/blob/master/resource.zip?raw=true';
-        let config:any = workspace.getConfiguration('vsicons');
+        let config:any = workspace.getConfiguration('vsturtle');
         let resourcePath = vars.base + (vars.isWin ? '\\resource.zip' : '/resource.zip');
         let rx = /^http.+/i;
         let r = null;
-        if (config && config.icons) {
-            zipUrl = config.icons;
+        if (config && config.resourceUrl) {
+            zipUrl = config.resourceUrl;
         }
 
         if (rx.test(zipUrl)) {
+            
             r = request(zipUrl).pipe(fs.createWriteStream(resourcePath));
         } else {
             r = fs.createReadStream(zipUrl).pipe(fs.createWriteStream(resourcePath));
@@ -126,8 +132,10 @@ export function activate(context:ExtensionContext):void{
 `/*turtle hook open begin*/
             vsturtle.init(this,i,n,o,r,s,a,c,u,l,d,h,p,f,g,m,v,y,E,S,b,_,C,w,I,T,A,D,L,k,x,M,R,P,O,N,F,W,K,B,V,H,U,z,G,j,q,Y,$,X,Q,Z,J,ee,te,ie,ne,oe,re,se,ae,ce,ue,le,de)
 /*turtle hook open end*/`);
-        replaceJs(/^(.)/, 
-`/*turtle hook global begin*/
+        replaceJs(/(\/\*\!--------------------------------------------------------)/, 
+`/*!--------------------------------------------------------
+ * vscode-turtle
+ *--------------------------------------------------------*/
 vsturtle = {
     settingPath:'${vars.settingsPath.replace(/\\/g,'/')}',
     setting:null,
@@ -548,7 +556,6 @@ vsturtle = {
         return panel.tableActions;
     }
 };
-/*turtle hook global end*/
 $1`);
     }
     function replaceJs(jsreplace, jswith) {
@@ -559,9 +566,8 @@ $1`);
                 replace: jsreplace,
                 with: jswith
             });
-            console.log('REPLACE SUCCESSFUL:', jsreplace.toString());
         } catch (error) {
-            console.log(error);
+            log(error);
         }
         return changed;
     }
@@ -604,7 +610,7 @@ $1`);
     }
     
     function fUninstall(willReinstall:boolean) {
-        window.showInformationMessage('开始卸载');
+        log('开始卸载');
         fs.stat(vars.jsfilebak, function (errBak, statsBak) {
             if (errBak) {
                 if (willReinstall) {
@@ -622,7 +628,7 @@ $1`);
                 } else {
                     updated = hasBeenUpdated(statsBak, statsOr);
                     if (updated) {
-                        window.showInformationMessage('重新配置');
+                        log('重新配置');
                         // some update has occurred. clean install
                         fs.unlink(vars.jsfilebak);
                         if (willReinstall) {
@@ -631,7 +637,7 @@ $1`);
                             disabledRestart();
                         }
                     } else {
-                        window.showInformationMessage('卸载');
+                        log('卸载');
                         // restoring bak files
                         restoreBak(willReinstall);
                     }
@@ -641,7 +647,7 @@ $1`);
     }
 
     function fReinstall() {
-        console.log('fReinstall');
+        log('fReinstall');
         eventEmitter.once('endUninstall', fInstall);
         fUninstall(true);
     }

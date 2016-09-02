@@ -2,7 +2,9 @@
 var gulp=require('gulp');
 var ts=require('gulp-typescript');
 var sourcemaps = require('gulp-sourcemaps');
+var del = require('del');
 gulp.task('tsc', function () {
+    del(['out/*']);
     var tsResult =gulp.src('src/*.ts')
         .pipe(sourcemaps.init())
         .pipe(ts({
