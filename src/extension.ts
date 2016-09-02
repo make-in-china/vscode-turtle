@@ -9,7 +9,7 @@ import * as events from 'events';
 import msg from './messages';
 import * as settings from './settings';
 export function deactivate(){
-    
+    console.log('vscode-turtle is deactivate!');
 }
 export function activate(context:ExtensionContext):void{
     let eventEmitter = new events.EventEmitter();
@@ -90,7 +90,6 @@ export function activate(context:ExtensionContext):void{
         let resourcePath = vars.base + (vars.isWin ? '\\resource.zip' : '/resource.zip');
         let rx = /^http.+/i;
         let r = null;
-        debugger;
         if (config && config.icons) {
             zipUrl = config.icons;
         }
@@ -623,6 +622,7 @@ $1`);
                 } else {
                     updated = hasBeenUpdated(statsBak, statsOr);
                     if (updated) {
+                        window.showInformationMessage('重新配置');
                         // some update has occurred. clean install
                         fs.unlink(vars.jsfilebak);
                         if (willReinstall) {
@@ -631,6 +631,7 @@ $1`);
                             disabledRestart();
                         }
                     } else {
+                        window.showInformationMessage('卸载');
                         // restoring bak files
                         restoreBak(willReinstall);
                     }
