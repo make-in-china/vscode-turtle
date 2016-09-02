@@ -19,7 +19,6 @@ export function activate(context:ExtensionContext):void{
     let reinstallTurtle:Disposable;
     let updateTurtleResource:Disposable;
     
-    console.log('vscode-turtle is active!');
     function showAdminPrivilegesError() {
         window.showInformationMessage(msg.admin);
         let state = settings.getState();
@@ -605,6 +604,7 @@ $1`);
     }
     
     function fUninstall(willReinstall:boolean) {
+        window.showInformationMessage('开始卸载');
         fs.stat(vars.jsfilebak, function (errBak, statsBak) {
             if (errBak) {
                 if (willReinstall) {
@@ -657,9 +657,11 @@ $1`);
     let state = settings.getState();
     if (state.status === settings.status.notInstalled) {
         fInstall();
-    } else  if (state.status === settings.status.enabled &&
+    } else if (state.status === settings.status.enabled &&
         state.version !== vars.extVersion) {
         // auto-update
         fReinstall();
     }
+    
+    console.log('vscode-turtle is active!');
 }
