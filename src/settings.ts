@@ -22,6 +22,8 @@ interface ISetting{
     pluginPath:string
     jsfile: string
     jsfilebak: string
+    jsmainfile: string
+    jsmainfilebak: string
     extVersion: string
 }
 export function getSettings():ISetting {
@@ -38,6 +40,9 @@ export function getSettings():ISetting {
     let base = appDir + (isWin ? '\\vs\\workbench' : '/vs/workbench');
     let jsfile = base + (isWin ? '\\workbench.main.js' : '/workbench.main.js');
     let jsfilebak = base + (isWin ? '\\workbench.main.js.turtle.bak' : '/workbench.main.js.turtle.bak');
+    let mainbase = appDir + (isWin ? '\\vs\\code\\electron-main' : '/vs/code/electron-main');
+    let jsmainfile = mainbase + (isWin ? '\\main.js' : '/main.js');
+    let jsmainfilebak = mainbase + (isWin ? '\\main.js.turtle.bak' : '/main.js.turtle.bak');
 
     settings = {
         appPath: appPath,
@@ -50,6 +55,8 @@ export function getSettings():ISetting {
         pluginPath: path.join(appPath, codePath, 'User', 'turtle.plugin'),
         jsfile: jsfile,
         jsfilebak: jsfilebak,
+        jsmainfile: jsmainfile,
+        jsmainfilebak: jsmainfilebak,
         extVersion: extVersion
     };
     return settings;
