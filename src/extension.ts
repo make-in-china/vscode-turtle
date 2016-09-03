@@ -690,15 +690,15 @@ vsturtle = {
                         this.titleLabel.addClass('hidden');
                     }
                     barBox.parent().getHTMLElement().insertBefore(element,barBox.getHTMLElement());
-                    var div=new builder_1.Builder(element);
-                    div.addClass('monaco-toolbar');
-                    tableBars.push(div);
-                    div.div({class:'monaco-action-bar animated'},(div)=>{
+                    var toolbar=new builder_1.Builder(element);
+                    toolbar.addClass('monaco-toolbar');
+                    toolbar.div({class:'monaco-action-bar animated'},(div)=>{
                         if(composite.toolbarleft){
                             div.style('text-align','center');
                             if(!hideActivityBar){
                                 div.addClass('hidden');
                             }
+                            tableBars.push(toolbar);
                         }else{
                             div.style('text-align','left');
                         }

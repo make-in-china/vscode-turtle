@@ -2,6 +2,7 @@ maps/*
 resource.zip
 src/*
 images/logo.psd
+images/demo.gif
 CHANGELOG.md
 GulpFile.js
 typings/*
