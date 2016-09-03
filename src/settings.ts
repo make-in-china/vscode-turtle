@@ -89,7 +89,8 @@ export function setStatus(sts) {
     setState({
         version: extVersion,
         status: sts,
-        scriptPaths:null
+        scriptPaths:null,
+        hideActivityBar:false
     });
 }
 

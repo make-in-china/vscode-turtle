@@ -222,6 +222,7 @@ $1`);
  *--------------------------------------------------------*/
 vsturtle = {
     settingPath:'${vars.settingsPath.replace(/\\/g,'/')}',
+    version:'${vars.extVersion}',
     setting:null,
     workbenchShell:null,
     nls:null,
@@ -315,6 +316,54 @@ vsturtle = {
     __param:function (paramIndex, decorator) {
         return function (target, key) { decorator(target, key, paramIndex); }
     },
+    loadPlugins:function(){
+        this.readSetting();
+        if(this.setting){
+            var paths=this.setting.scriptPaths;
+            if(paths&&paths.length){
+                for(var i=0;i<paths.length;i++){
+                    try{
+                        require(paths[i]).turtleActivate();
+                    }catch(e){
+                        console.log(e);
+                    }
+                }
+            }
+        }
+    },
+    readSetting:function(){
+        try{
+            var datas = fs.readFileSync(this.settingPath);
+            this.setting=JSON.parse(datas);
+            if(this.setting){
+
+                if(this.setting.hideActivityBar===undefined){
+                    this.setting.hideActivityBar=false;
+                }else{
+                    this.setting.hideActivityBar=!!this.setting.hideActivityBar;
+                }
+            }else{
+                this.setting={
+                    version: '1.0.17',
+                    status: 'enabled',
+                    scriptPaths:null,
+                    hideActivityBar:false
+                }
+            }
+        }catch(e){
+            console.log(e);
+        }
+    },
+    saveSetting:function(){
+        try{
+            if(this.setting){
+                var datas = JSON.stringify(this.setting);
+                fs.writeFileSync(this.settingPath,datas);
+            }
+        }catch(e){
+            console.log(e);
+        }
+    },
     init:function(workbenchShell,nls, platform, builder_1, dom, aria, lifecycle_1, errors, product_1, package_1, contextViewService_1, timer, workbench_1, storage_1, telemetry_1, telemetryIpc_1, telemetryService_1, idleMonitor_1, errorTelemetry_1, workbenchCommonProperties_1, integration_1, update_1, workspaceStats_1, windowService_1, messageService_1, request_1, requestService_1, configuration_1, fileService_1, searchService_1, lifecycleService_1, threadService_1, markerService_1, modelService_1, modelServiceImpl_1, compatWorkerService_1, compatWorkerServiceMain_1, codeEditorServiceImpl_1, codeEditorService_1, editorWorkerServiceImpl_1, editorWorkerService_1, mainThreadExtensionService_1, storage_2, serviceCollection_1, instantiationService_1, contextView_1, event_1, files_1, lifecycle_2, markers_1, environment_1, message_1, search_1, threadService_2, commands_1, commandService_1, workspace_1, extensions_1, modeServiceImpl_1, modeService_1, untitledEditorService_1, crashReporter_1, themeService_1, themeService_2, ipc_1, ipc_net_1, ipc_electron, electron_1, extensionManagementIpc_1, extensionManagement_1){
         var _this=this;
         this.workbenchShell=workbenchShell;
@@ -381,24 +430,8 @@ vsturtle = {
         this.themeService_1=themeService_1;
         this.themeService_2=themeService_2;
         this.ipc_1=ipc_1;
-        try{
-            var paths = fs.readFileSync(this.settingPath);
-            this.setting=JSON.parse(paths);
-        }catch(e){
-            console.log(e);
-        }
-        if(this.setting){
-            paths=this.setting.scriptPaths;
-            if(paths){
-                for(var i=0;i<paths.length;i++){
-                    try{
-                        require(paths[i]).turtleActivate();
-                    }catch(e){
-                        console.log(e);
-                    }
-                }
-            }
-        }
+
+        this.loadPlugins();
         //修改CompositePart 和 4个panel;
 
         var Workbench=require('vs/workbench/electron-browser/workbench').Workbench;
@@ -641,7 +674,7 @@ vsturtle = {
             return ret;
         };
         var tableBars=[];
-        var activityBarHide=false;
+        var hideActivityBar=this.setting.hideActivityBar;
         var collectCompositeActions=CompositePart.prototype.collectCompositeActions;
         CompositePart.prototype.collectCompositeActions = function (composite) {
             var _this=this;
@@ -668,7 +701,7 @@ vsturtle = {
                             div.style('text-align','left');
                         }
                         _this.tableBar=div;
-                        if(!activityBarHide){
+                        if(!hideActivityBar){
                             div.addClass('hidden');
                         }
                         div.div({},(div)=>{
@@ -729,50 +762,85 @@ vsturtle = {
         var prototypeLayout=vsturtle.workbench.workbenchLayout.__proto__;
         var layout=prototypeLayout.layout;
         var workbenchLayout=null;
+
+        var Dimension=builder_1.Dimension;
+        var activityBarDimension=function(width,height){
+            this.width=width;
+            this.height=height-35;
+        }
+        activityBarDimension.prototype=Dimension.prototype;
+
+        var siderBarDimension=function(width,height){
+            this.width=0;
+            this.height=height;
+        }
+        siderBarDimension.prototype=Dimension.prototype;
+
+        var editBarDimension=function(width,height){
+            this.width=width;
+            this.height=height+35;
+        }
+        editBarDimension.prototype=Dimension.prototype;
+
         function layout2(){
             var count=0;
-            var Dimension=builder_1.Dimension;
             workbenchLayout=this;
             builder_1.Dimension=function(width,height){
                 count++;
-                if(count===2){
-                    builder_1.Dimension=Dimension;
-                    var siderBarDimension=function(){
-                        this.width=0;
-                        this.height=height;
-                    }
-                    siderBarDimension.prototype=Dimension.prototype;
+                if(count===1){
+                    return new activityBarDimension(width,height);
+                }else if(count===2){
                     workbenchLayout.computedStyles.activitybar.minWidth=0;
-                    return new siderBarDimension();
+                    return new siderBarDimension(width,height);
+                }else if(count===4){
+                    builder_1.Dimension=Dimension;
+                    return new editBarDimension(width,height);
                 }else{
                     return new Dimension(width,height);
                 }
             }
             layout.call(this);
         }
+        function fHideActivityBar(){
+            vsturtle.activitybar.addClass('hidden');
+            prototypeLayout.layout=layout2;
+            tableBars.forEach((element)=>{
+                return element.removeClass("hidden");
+            });
+            vsturtle.workbench.layout();
+            vsturtle.workbench.layout();
+        }
+        function fShowActivityBar(){
 
-        ipc.on('turtle:toggleActivityPanel', function (event) {debugger;
-            if(activityBarHide){
-                activityBarHide=false;
+            vsturtle.activitybar.removeClass('hidden');
+            prototypeLayout.layout=layout;
+            workbenchLayout.computedStyles.activitybar.minWidth=50;
+            tableBars.forEach((element)=>{
+                return element.addClass("hidden");
+            });
+            vsturtle.workbench.layout();
+            vsturtle.workbench.layout();
+        }
+        function updateActivityBarState(state){
+            hideActivityBar=state;
+            _this.readSetting();
+            _this.setting.hideActivityBar=state;
+            _this.saveSetting();
+        }
 
-                vsturtle.activitybar.removeClass('hidden');
-                prototypeLayout.layout=layout;
-                workbenchLayout.computedStyles.activitybar.minWidth=50;
-                tableBars.forEach((element)=>{
-                    return element.addClass("hidden");
-                });
+        ipc.on('turtle:toggleActivityPanel', function (event) {
+            if(hideActivityBar){
+                updateActivityBarState(false);
+                fShowActivityBar();
             }else{
-                activityBarHide=true;
-                vsturtle.activitybar.addClass('hidden');
-                prototypeLayout.layout=layout2;
-                tableBars.forEach((element)=>{
-                    return element.removeClass("hidden");
-                });
+                updateActivityBarState(true);
+                fHideActivityBar();
             }
-            vsturtle.workbench.layout();
-            vsturtle.workbench.layout();
         });
-
+        debugger;
+        if(hideActivityBar){
+            fHideActivityBar();
+        }
     },
     getTableActions:function(panel,panelName){
         if (!panel.tableActions){
