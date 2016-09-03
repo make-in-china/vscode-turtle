@@ -1,5 +1,7 @@
 # Vscode-Turtle
 
+<img src="https://raw.githubusercontent.com/robertohuertasm/vscode-icons/master/screenshot.png" >
+
 兼容vscode-icons
 
 更新资源请运行：

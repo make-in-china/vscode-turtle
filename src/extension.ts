@@ -632,7 +632,6 @@ vsturtle = {
                     .prototype.getTableActions=function(){
                         return _this.getIconActions(this,'Explorer');
                     }
-                    composite.hasTableActions=true;
                     break;
             }
         }
@@ -697,13 +696,13 @@ vsturtle = {
                     div.div({class:'monaco-action-bar animated'},(div)=>{
                         if(composite.toolbarleft){
                             div.style('text-align','center');
+                            if(!hideActivityBar){
+                                div.addClass('hidden');
+                            }
                         }else{
                             div.style('text-align','left');
                         }
                         _this.tableBar=div;
-                        if(!hideActivityBar){
-                            div.addClass('hidden');
-                        }
                         div.div({},(div)=>{
                             _this.tableBarBox=div;
                         });
