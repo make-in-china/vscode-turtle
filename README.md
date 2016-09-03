@@ -1,8 +1,6 @@
 # Vscode-Turtle
 
-<img src="https://raw.githubusercontent.com/robertohuertasm/vscode-icons/master/screenshot.png" >
-
-兼容vscode-icons
+<img src="https://github.com/make-in-china/vscode-turtle/demo.gif" >
 
 更新资源请运行：
 
@@ -12,7 +10,13 @@ Turtle Update
 
 Turtle Disabled
 
-修改了代码的文件
+# 兼容vscode-icons
+如果先安装了vscode-icons，再安装的vscode-turtle，那么卸载vscode-icons前请先disabled vscode-turtle
+
+如果先安装了vscode-turtle，再安装的vscode-icons，那么卸载vscode-turtle前请先disabled vscode-icons
+
+# 使用须知
+Vscode-Turtle对以下文件打了补丁
 
 `vs\workbench\workbench.main.js`
 
