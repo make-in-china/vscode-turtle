@@ -1,6 +1,6 @@
 # Vscode-Turtle
 
-<img src="https://github.com/make-in-china/vscode-turtle/blob/master/demo.gif" >
+<img src="demo.gif" >
 
 更新资源请运行：
 
