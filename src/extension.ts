@@ -1,6 +1,6 @@
 /// <reference path="../typings/vscode-typings.d.ts" />
 'use strict';
-import {Disposable,commands,ExtensionContext,window,workspace} from 'vscode';
+import {Disposable,commands,ExtensionContext,window,workspace,StatusBarAlignment, StatusBarItem} from 'vscode';
 import * as fs from 'fs';
 import * as events from 'events';
 import msg from './messages';
@@ -17,6 +17,7 @@ let log=(()=>{
 })();
 export function deactivate(){}
 export function activate(context:ExtensionContext):void{
+
     let eventEmitter = new events.EventEmitter();
     let vars = settings.getSettings();
     let installTurtle:Disposable;
@@ -31,6 +32,13 @@ export function activate(context:ExtensionContext):void{
             settings.deleteState();
         }
     }
+
+    let btn=window.createStatusBarItem(StatusBarAlignment.Left,2147483647);
+    btn.tooltip='切换左侧面板';
+    btn.text="$(togglesidebar)";
+    btn.command='turtle.toggleSideBar';
+    btn.show();
+
     process.on('uncaughtException', function (err) {
         if (/ENOENT|EACCES|EPERM/.test(err.code)) {
             showAdminPrivilegesError();
@@ -133,22 +141,63 @@ export function activate(context:ExtensionContext):void{
             });
         });
     }
+    let globalCode:string=
+`/*!--------------------------------------------------------
+ * vscode-turtle
+ *--------------------------------------------------------*/
+vsturtle = {
+    settingPath:'${vars.settingsPath.replace(/\\/g,'/')}',
+    version:'${vars.extVersion}',
+    readSetting:function(){
+        try{
+            var datas = fs.readFileSync(this.settingPath);
+            this.setting=JSON.parse(datas);
+            if(this.setting){
+
+                if(this.setting.hideActivityBar===undefined){
+                    this.setting.hideActivityBar=false;
+                }else{
+                    this.setting.hideActivityBar=!!this.setting.hideActivityBar;
+                }
+            }else{
+                this.setting={
+                    version: _this.status,
+                    status: 'enabled',
+                    scriptPaths:null,
+                    hideActivityBar:false
+                }
+            }
+        }catch(e){
+            this.setting={
+                version: _this.status,
+                status: 'enabled',
+                scriptPaths:null,
+                hideActivityBar:false
+            }
+        }
+    },
+    saveSetting:function(){
+        try{
+            if(this.setting){
+                var datas = JSON.stringify(this.setting);
+                fs.writeFileSync(this.settingPath,datas);
+            }
+        }catch(e){
+            console.log(e);
+        }
+    },`;
     function replaceCodeMainJs(){
 
         replaceJs(vars.jsmainfile,/([a-z])\.createInstance\(([a-z])\.VSCodeMenu\)/,
 `vsturtle.createVSCodeMenu(this,h,l.VSCodeMenu,b)`);
         replaceJs(vars.jsmainfile,/(\/\*\!----)/,
-`/*!--------------------------------------------------------
- * vscode-turtle
- *--------------------------------------------------------*/
-vsturtle = {
+`${globalCode}
     createVSCodeMenu:function(main,what,VSCodeMenu,windowsService){
         var electron=require('electron');
 		var ipc=electron.ipcMain;
 		var platform=require('vs/base/common/platform');
         var Menu=electron.Menu;
         var MenuItem=electron.MenuItem;
-
 
         function __separator__() {
             return new MenuItem({ type: 'separator' });
@@ -168,6 +217,9 @@ vsturtle = {
             var reloadWindow = this.createMenuItem(mnemonicLabel('重启VSC(&&R)'), function(){
 				windowsService.getFocusedWindow().win.reload();
 			});
+            var uninstallTurtle = this.createMenuItem(mnemonicLabel('完全卸载玄武'), function(){
+
+			});
 			var plugins=new Menu();
 			// plugins.append(this.createMenuItem(mnemonicLabel('插件1'), function(){
 
@@ -183,7 +235,9 @@ vsturtle = {
                 toggleActivityPanel,
                 reloadWindow,
                 __separator__(),
-                pluginMenuItem
+                pluginMenuItem,
+                __separator__(),
+                uninstallTurtle
             ].forEach(function (item) { return winLinuxTurtleMenu.append(item); });
         };
 
@@ -217,12 +271,7 @@ $1`);
             vsturtle.init(this,i,n,o,r,s,a,c,u,l,d,h,p,f,g,m,v,y,E,S,b,_,C,w,I,T,A,D,L,k,x,M,R,P,O,N,F,W,K,B,V,H,U,z,G,j,q,Y,$,X,Q,Z,J,ee,te,ie,ne,oe,re,se,ae,ce,ue,le,de)
 /*turtle hook open end*/`);
         replaceJs(vars.jsfile,/(\/\*\!----)/,
-`/*!--------------------------------------------------------
- * vscode-turtle
- *--------------------------------------------------------*/
-vsturtle = {
-    settingPath:'${vars.settingsPath.replace(/\\/g,'/')}',
-    version:'${vars.extVersion}',
+`${globalCode}
     setting:null,
     workbenchShell:null,
     nls:null,
@@ -331,39 +380,6 @@ vsturtle = {
             }
         }
     },
-    readSetting:function(){
-        try{
-            var datas = fs.readFileSync(this.settingPath);
-            this.setting=JSON.parse(datas);
-            if(this.setting){
-
-                if(this.setting.hideActivityBar===undefined){
-                    this.setting.hideActivityBar=false;
-                }else{
-                    this.setting.hideActivityBar=!!this.setting.hideActivityBar;
-                }
-            }else{
-                this.setting={
-                    version: '1.0.17',
-                    status: 'enabled',
-                    scriptPaths:null,
-                    hideActivityBar:false
-                }
-            }
-        }catch(e){
-            console.log(e);
-        }
-    },
-    saveSetting:function(){
-        try{
-            if(this.setting){
-                var datas = JSON.stringify(this.setting);
-                fs.writeFileSync(this.settingPath,datas);
-            }
-        }catch(e){
-            console.log(e);
-        }
-    },
     init:function(workbenchShell,nls, platform, builder_1, dom, aria, lifecycle_1, errors, product_1, package_1, contextViewService_1, timer, workbench_1, storage_1, telemetry_1, telemetryIpc_1, telemetryService_1, idleMonitor_1, errorTelemetry_1, workbenchCommonProperties_1, integration_1, update_1, workspaceStats_1, windowService_1, messageService_1, request_1, requestService_1, configuration_1, fileService_1, searchService_1, lifecycleService_1, threadService_1, markerService_1, modelService_1, modelServiceImpl_1, compatWorkerService_1, compatWorkerServiceMain_1, codeEditorServiceImpl_1, codeEditorService_1, editorWorkerServiceImpl_1, editorWorkerService_1, mainThreadExtensionService_1, storage_2, serviceCollection_1, instantiationService_1, contextView_1, event_1, files_1, lifecycle_2, markers_1, environment_1, message_1, search_1, threadService_2, commands_1, commandService_1, workspace_1, extensions_1, modeServiceImpl_1, modeService_1, untitledEditorService_1, crashReporter_1, themeService_1, themeService_2, ipc_1, ipc_net_1, ipc_electron, electron_1, extensionManagementIpc_1, extensionManagement_1){
         var _this=this;
         this.workbenchShell=workbenchShell;
@@ -434,17 +450,21 @@ vsturtle = {
         this.loadPlugins();
         //修改CompositePart 和 4个panel;
 
-        var Workbench=require('vs/workbench/electron-browser/workbench').Workbench;
-        var CompositePart=require('vs/workbench/browser/parts/compositePart').CompositePart;
-        var ActivitybarPart=require('vs/workbench/browser/parts/activitybar/activitybarPart').ActivitybarPart;
         var IPartService=require('vs/workbench/services/part/common/partService').IPartService;
         var IPanelService=require('vs/workbench/services/panel/common/panelService').IPanelService;
         var ITerminalService=require('vs/workbench/parts/terminal/electron-browser/terminal').ITerminalService;
-        var viewlet=require('vs/workbench/browser/viewlet');
         var IViewletService=require('vs/workbench/services/viewlet/common/viewletService').IViewletService;
         var IWorkbenchEditorService=require('vs/workbench/services/editor/common/editorService').IWorkbenchEditorService;
 
+        var Workbench=require('vs/workbench/electron-browser/workbench').Workbench;
+        var CompositePart=require('vs/workbench/browser/parts/compositePart').CompositePart;
+        var ActivitybarPart=require('vs/workbench/browser/parts/activitybar/activitybarPart').ActivitybarPart;
+        var ActivityActionItem=require('vs/workbench/browser/parts/activitybar/activityAction').ActivityActionItem;
         var Action=require('vs/base/common/actions').Action;
+
+        var viewlet=require('vs/workbench/browser/viewlet');
+        var activityService=require('vs/workbench/services/activity/common/activityService');
+
         define('tablebar',['vs/nls!vs/workbench/workbench.turtle','vs/css!vs/workbench/media/tablebar'],function(nlsturtle){
             vsturtle.nls=nlsturtle.tableBar;
         });
@@ -674,6 +694,44 @@ vsturtle = {
         };
         var tableBars=[];
         var hideActivityBar=this.setting.hideActivityBar;
+        var activityActionItems={
+            updateBadge:function(that,badge){
+                var name=that._action._id;
+                var $badgeContent=this.$badgeContents[name];
+                if(!$badgeContent){
+                    return;
+                }
+                var $badge=this.$badges[name];
+                if (badge) {
+                    // Number
+                    if (badge instanceof activityService.NumberBadge) {
+                        var n = badge.number;
+                        if (n) {
+                            $badgeContent.text(n > 99 ? '99+' : n.toString());
+                            $badge.show();
+                        }
+                    }
+                    else if (badge instanceof activityService.TextBadge) {
+                        $badgeContent.text(badge.text);
+                        $badge.show();
+                    }
+                    else if (badge instanceof activityService.IconBadge) {
+                        $badge.show();
+                    }
+                    else if (badge instanceof activityService.ProgressBadge) {
+                        $badge.show();
+                    }
+                }
+            },
+            $badgeContents:{},
+            $badges:{}
+        }
+        var updateBadge=ActivityActionItem.prototype.updateBadge;
+        ActivityActionItem.prototype.updateBadge=function(badge){
+            activityActionItems.updateBadge(this,badge);
+            updateBadge.call(this,badge);
+        }
+
         var collectCompositeActions=CompositePart.prototype.collectCompositeActions;
         CompositePart.prototype.collectCompositeActions = function (composite) {
             var _this=this;
@@ -693,14 +751,12 @@ vsturtle = {
                     var toolbar=new builder_1.Builder(element);
                     toolbar.addClass('monaco-toolbar');
                     toolbar.div({class:'monaco-action-bar animated'},(div)=>{
+                        div.style('text-align','left');
                         if(composite.toolbarleft){
-                            div.style('text-align','center');
                             if(!hideActivityBar){
                                 div.addClass('hidden');
                             }
                             tableBars.push(toolbar);
-                        }else{
-                            div.style('text-align','left');
                         }
                         _this.tableBar=div;
                         div.div({},(div)=>{
@@ -734,6 +790,20 @@ vsturtle = {
                                 title:element.tooltip,
                                 innerHtml:element.label
                             });
+                            if(composite.toolbarleft){
+                                var name=element.viewletId+'.activity-bar-action';
+                                div.div({
+                                    class:'full',
+                                    title:element.tooltip
+                                },$badge=>{
+                                    activityActionItems.$badges[name]=$badge;
+                                    $badge.div({
+                                        class:'turtle-badge-content'
+                                    },$badgeContent=>{
+                                        activityActionItems.$badgeContents[name]=$badgeContent;
+                                    });
+                                });
+                            }
                         });
                     });
                 }
@@ -755,7 +825,9 @@ vsturtle = {
             vsturtle.activitybar=vsturtle.builder_1.$(ret.getHTMLElement().parentNode);
             return ret;
         }
-
+        /**
+         * 初始化界面
+         */
         workbenchShell.contentsContainer = workbenchShell.createContents(builder_1.$(workbenchShell.content));
 
         var prototypeLayout=vsturtle.workbench.workbenchLayout.__proto__;
@@ -836,7 +908,6 @@ vsturtle = {
                 fHideActivityBar();
             }
         });
-        debugger;
         if(hideActivityBar){
             fHideActivityBar();
         }
@@ -916,31 +987,46 @@ $1`);
     function emitEndUninstall() {
         eventEmitter.emit('endUninstall');
     }
-    function restoredAction(isRestored:number, willReinstall:boolean) {
-        // if (isRestored === 2) {
+    function restoredAction(restoredCount:number, willReinstall:boolean) {
+        if (restoredCount === 2/**卸载成功文件数*/) {
             if (willReinstall) {
                 emitEndUninstall();
             } else {
                 disabledRestart();
             }
-        // }
+        }
     }
 
     function restoreBak(willReinstall:boolean):void {
         let restore = 0;
-        let j = null;
-        let c = null;
+        let jsfile = null;
+        let jsmainfile = null;
 
         fs.unlink(vars.jsfile, function (err) {
             if (err) {
                 showAdminPrivilegesError();
                 return;
             }
-            j = fs.createReadStream(vars.jsfilebak)
+            jsfile = fs.createReadStream(vars.jsfilebak)
             .pipe(fs.createWriteStream(vars.jsfile));
-            j.on('finish', function () {
-                log("卸载完成");
+            jsfile.on('finish', function () {
+                log("卸载workbench完成");
                 fs.unlink(vars.jsfilebak);
+                restore++;
+                restoredAction(restore, willReinstall);
+            });
+
+        });
+        fs.unlink(vars.jsmainfile, function (err) {
+            if (err) {
+                showAdminPrivilegesError();
+                return;
+            }
+            jsmainfile = fs.createReadStream(vars.jsmainfilebak)
+            .pipe(fs.createWriteStream(vars.jsmainfile));
+            jsmainfile.on('finish', function () {
+                log("卸载main完成");
+                fs.unlink(vars.jsmainfilebak);
                 restore++;
                 restoredAction(restore, willReinstall);
             });
@@ -953,9 +1039,8 @@ $1`);
         addResource();
         settings.setStatus(settings.status.enabled);
     }
-
-    function fUninstall(willReinstall:boolean) {
-        fs.stat(vars.jsfilebak, function (errBak, statsBak) {
+    function fUninstallMain(willReinstall:boolean){
+        fs.stat(vars.jsmainfilebak, function (errBak, statsBak) {
             if (errBak) {
                 if (willReinstall) {
                     emitEndUninstall();
@@ -965,7 +1050,7 @@ $1`);
                 return;
             }
             // checking if normal file has been udpated.
-            fs.stat(vars.jsfile, function (errOr, statsOr) {
+            fs.stat(vars.jsmainfile, function (errOr, statsOr) {
                 let updated = false;
                 if (errOr) {
                     window.showInformationMessage(msg.smthingwrong + errOr);
@@ -987,6 +1072,27 @@ $1`);
             });
         });
     }
+    function fUninstall(willReinstall:boolean) {
+        fs.stat(vars.jsfilebak, function (errBak, statsBak) {
+            if (errBak) {
+                if (willReinstall) {
+                    emitEndUninstall();
+                } else {
+                    window.showInformationMessage(msg.already_disabled);
+                }
+                return;
+            }
+            // checking if normal file has been udpated.
+            fs.stat(vars.jsfile, function (errOr, statsOr) {
+                let updated = false;
+                if (errOr) {
+                    window.showInformationMessage(msg.smthingwrong + errOr);
+                } else {
+                    fUninstallMain(willReinstall);
+                }
+            });
+        });
+    }
 
     function fReinstall() {
         eventEmitter.once('endUninstall', fInstall);
@@ -1000,6 +1106,7 @@ $1`);
     context.subscriptions.push(installTurtle);
     context.subscriptions.push(uninstallTurtle);
     context.subscriptions.push(reinstallTurtle);
+
 
     let state = settings.getState();
     if (state.status === settings.status.notInstalled) {
