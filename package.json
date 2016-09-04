@@ -2,7 +2,7 @@
 	"name": "vscode-turtle",
 	"displayName": "Vscode-Turtle",
 	"description": "Turtle for Visual Studio Code",
-	"version": "1.0.29",
+	"version": "1.0.30",
 	"publisher": "feihuangtengda",
 	"license": "MIT",
 	"author": {
@@ -43,10 +43,6 @@
             {
                 "command": "extension.uninstallTurtle",
                 "title": "Turtle Disable"
-            },
-            {
-                "command": "extension.reinstallTurtle",
-                "title": "Turtle Update"
             }
         ]
 	},

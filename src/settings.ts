@@ -11,7 +11,7 @@ export const status = {
     disabled: 'disabled',
     notInstalled: 'notInstalled'
 };
-interface ISetting{
+export interface ISetting{
     appPath: string
     isWin: boolean
     base:string
