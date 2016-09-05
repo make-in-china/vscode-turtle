@@ -7,6 +7,7 @@ export function getTop(vars:ISetting):string{
 vsturtle = {
     settingPath:'${vars.settingsPath.replace(/\\/g,'/')}',
     version:'${vars.extVersion}',
+    setting:null,
     readSetting:function(){
         try{
             var datas = fs.readFileSync(this.settingPath);
@@ -69,9 +70,9 @@ export function getMain(top:string){
         function setturtleMenu(winLinuxTurtleMenu) {
             var toggleActivityPanel = this.createMenuItem(mnemonicLabel('切换导航边栏(&&T)'), function(){
 
-                this.readSetting();
-                if(this.setting.enabled!=='enabled'){
-                    
+                vsturtle.readSetting();
+                if(vsturtle.setting.status!=='enabled'){
+                    throw new Error('未激活!卸载后没有完全关闭所有VSC!');
                     return;
                 }
 				windowsService.sendToFocused('turtle:toggleActivityPanel');

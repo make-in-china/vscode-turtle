@@ -17,8 +17,8 @@ Turtle Disabled
 # 提需求
 提需求请加我QQ：692425987，嗷
 # 使用须知
-Vscode-Turtle对以下文件打了补丁
+Vscode-Turtle对以下文件打了补丁，并生成了备份文件在原文件夹下
 
-`vs\workbench\workbench.main.js`
+`vs\workbench\workbench.main.js`渲染进程
 
-`vs\code\electron-main\main.js`
+`vs\code\electron-main\main.js`主进程
