@@ -18,7 +18,7 @@ let log=(()=>{
 })();
 export function deactivate(){}
 export function activate(context:ExtensionContext):void{
-    
+
     console.log(msg.welcome);
     let eventEmitter = new events.EventEmitter();
     let vars = settings.getSettings();
@@ -40,6 +40,12 @@ export function activate(context:ExtensionContext):void{
     btn.text="$(togglesidebar)";
     btn.command='turtle.toggleSideBar';
     btn.show();
+
+    let btnToggleToolbar=window.createStatusBarItem(StatusBarAlignment.Left,2147483647);
+    btnToggleToolbar.tooltip=msg.toggleToolBarTooltip;
+    btnToggleToolbar.text="$(togglesidebar)";
+    btnToggleToolbar.command='turtle.toggleToolBar';
+    btnToggleToolbar.show();
 
     process.on('uncaughtException', function (err) {
         if (/ENOENT|EACCES|EPERM/.test(err.code)) {
@@ -148,13 +154,13 @@ export function activate(context:ExtensionContext):void{
     function replaceCodeMainJs(){
 
         replaceJs(vars.jsmainfile,/([a-z])\.createInstance\(([a-z])\.VSCodeMenu\)/,
-`vsturtle.createVSCodeMenu(this,h,l.VSCodeMenu,b)`);
+`vsturtle.createVSCodeMenu(this,$1,$2.VSCodeMenu,b)`);
         replaceJs(vars.jsmainfile,/(\/\*\!----)/,replacement.getMain(sTop));
     }
     function replaceWorkbenchJs() {
         replaceJs(vars.jsfile,/this\.contentsContainer\=this\.createContents\([a-z]\.\$\(this\.content\)\)/,
 `/*turtle hook open begin*/
-            vsturtle.init(this,i,n,o,r,s,a,c,u,l,d,h,p,f,g,m,v,y,E,S,b,_,C,w,I,T,A,D,L,k,x,M,R,P,O,N,F,W,K,B,V,H,U,z,G,j,q,Y,$,X,Q,Z,J,ee,te,ie,ne,oe,re,se,ae,ce,ue,le,de)
+            vsturtle.init(this,i,n,o,r)
 /*turtle hook open end*/`);
         replaceJs(vars.jsfile,/(\/\*\!----)/,replacement.getWorkbench(sTop));
     }
@@ -295,11 +301,11 @@ export function activate(context:ExtensionContext):void{
 
     installTurtle = commands.registerCommand('extension.installTurtle', fInstall);
     uninstallTurtle = commands.registerCommand('extension.uninstallTurtle', fUninstall);
-    // reinstallTurtle = commands.registerCommand('extension.reinstallTurtle', fReinstall);
+    reinstallTurtle = commands.registerCommand('extension.reinstallTurtle', fReinstall);
 
     context.subscriptions.push(installTurtle);
     context.subscriptions.push(uninstallTurtle);
-    // context.subscriptions.push(reinstallTurtle);
+    context.subscriptions.push(reinstallTurtle);
 
 
     let state = settings.getState();

@@ -43,6 +43,10 @@
             {
                 "command": "extension.uninstallTurtle",
                 "title": "Turtle Disable"
+            },
+            {
+                "command": "extension.reinstallTurtle",
+                "title": "Turtle Update"
             }
         ]
 	},

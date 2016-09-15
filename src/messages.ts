@@ -14,7 +14,8 @@ let msg:{
         toggleSidebarTooltip:'切换左侧面板',
         resourcesAreLoaded:'资源加载完成',
         uninstallWorkBench:'卸载“vs/workbench/workbench.main.js”完成',
-        uninstallMain:'卸载“vs/node/electron-main/main.js”完成'
+        uninstallMain:'卸载“vs/node/electron-main/main.js”完成',
+        toggleToolBarTooltip:'切换工具栏'
     },
     '':{
         welcome:'vscode-turtle is active!',
@@ -25,10 +26,11 @@ let msg:{
         disabled: 'Turtle disabled. Fully closed all VSCode to take effect.',
         already_disabled: 'Turtle already disabled.',
         smthingwrong: 'Something went wrong: ',
-        toggleSidebarTooltip:'toggleSidebar',
+        toggleSidebarTooltip:'toggle Sidebar',
         resourcesAreLoaded:'Resources are loaded',
         uninstallWorkBench:'uninstall "vs/workbench/workbench.main.js" is done',
-        uninstallMain:'uninstall "vs/node/electron-main/main.js" is done'
+        uninstallMain:'uninstall "vs/node/electron-main/main.js" is done',
+        toggleToolBarTooltip:'toggle Toolbar'
     }
 }
 interface IMessage{
@@ -39,6 +41,7 @@ interface IMessage{
     already_disabled: string
     smthingwrong: string
     toggleSidebarTooltip:string
+    toggleToolBarTooltip:string
     resourcesAreLoaded:string
     uninstallWorkBench:string
     uninstallMain:string

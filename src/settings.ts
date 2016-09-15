@@ -11,6 +11,7 @@ export const status = {
     disabled: 'disabled',
     notInstalled: 'notInstalled'
 };
+
 export interface ISetting{
     appPath: string
     isWin: boolean
@@ -25,6 +26,13 @@ export interface ISetting{
     jsmainfile: string
     jsmainfilebak: string
     extVersion: string
+}
+export interface ISettingJSON{
+    version: string
+    status: string
+    scriptPaths:string
+    hideActivityBar:boolean
+    hideToolBar:boolean
 }
 export function getSettings():ISetting {
     if (settings) return settings;
@@ -80,7 +88,7 @@ export function getState():IState {
     }
 }
 
-export function setState(state) {
+export function setState(state:ISettingJSON) {
     let lets = getSettings();
     fs.writeFileSync(lets.settingsPath, JSON.stringify(state));
 }
@@ -90,7 +98,8 @@ export function setStatus(sts) {
         version: extVersion,
         status: sts,
         scriptPaths:null,
-        hideActivityBar:false
+        hideActivityBar:false,
+        hideToolBar:false
     });
 }
 
